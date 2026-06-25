@@ -1,17 +1,15 @@
 import { useState, useRef, useCallback } from 'react';
 import Webcam from 'react-webcam';
-import { Camera, Upload, CheckCircle } from 'lucide-react';
+import { Camera, Upload, CheckCircle, Zap, Bell, Calendar } from 'lucide-react';
 import { verificationApi } from '../api/client';
 
 export default function Recognize() {
-  const [mode, setMode] = useState(null); // 'camera' | 'file' | null
+  const [mode, setMode] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
-  
   const webcamRef = useRef(null);
 
-  // Convert base64 from webcam to a File object for the API
   const urlToFile = async (url, filename, mimeType) => {
     const res = await fetch(url);
     const buf = await res.arrayBuffer();
@@ -49,68 +47,117 @@ export default function Recognize() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto bg-white p-8 rounded-xl shadow-sm border border-gray-100">
-      <h1 className="text-3xl font-bold text-center text-emerald-800 mb-8">Facial Recognition</h1>
+    <div className="max-w-4xl mx-auto space-y-12">
+      
+      {/* Professional Hero Section */}
+      <div className="text-center space-y-4 max-w-2xl mx-auto">
+        <h1 className="text-4xl md:text-5xl font-extrabold text-slate-900 tracking-tight">
+          Your festival,<br />
+          <span className="text-indigo-600">in your pocket.</span>
+        </h1>
+        <p className="text-lg text-slate-600">
+          No queues. No confusion. Identify yourself instantly to access your live schedule, published results, and venue updates.
+        </p>
+      </div>
 
-      {/* Mode Selection */}
-      {!mode && (
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <button 
-            onClick={() => setMode('camera')}
-            className="flex flex-col items-center p-8 bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg hover:border-emerald-500 hover:bg-emerald-50 transition"
-          >
-            <Camera size={48} className="text-emerald-600 mb-4" />
-            <span className="font-semibold text-gray-700">Open Camera</span>
-          </button>
-          
-          <label className="flex flex-col items-center p-8 bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg hover:border-emerald-500 hover:bg-emerald-50 transition cursor-pointer">
-            <Upload size={48} className="text-emerald-600 mb-4" />
-            <span className="font-semibold text-gray-700">Upload File</span>
-            <input type="file" accept="image/*" className="hidden" onChange={handleFileUpload} />
-          </label>
-        </div>
-      )}
+      {/* Recognition Tool Card */}
+      <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 max-w-2xl mx-auto relative overflow-hidden">
+        <div className="absolute top-0 left-0 w-full h-1 bg-indigo-600"></div>
+        
+        <h2 className="text-2xl font-bold text-center text-slate-800 mb-8">Participant Verification</h2>
 
-      {/* Camera View */}
-      {mode === 'camera' && (
-        <div className="flex flex-col items-center">
-          <div className="rounded-lg overflow-hidden border-4 border-emerald-100 mb-4">
-            <Webcam
-              audio={false}
-              ref={webcamRef}
-              screenshotFormat="image/jpeg"
-              videoConstraints={{ facingMode: "user" }}
-              className="w-full max-w-md"
-            />
+        {!mode && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <button 
+              onClick={() => setMode('camera')}
+              className="group flex flex-col items-center p-8 bg-slate-50 border-2 border-dashed border-slate-300 rounded-xl hover:border-indigo-500 hover:bg-indigo-50/50 transition"
+            >
+              <Camera size={48} className="text-slate-400 group-hover:text-indigo-600 mb-4 transition-colors" />
+              <span className="font-semibold text-slate-700 group-hover:text-indigo-900">Take a Selfie</span>
+              <span className="text-xs text-slate-500 mt-2 text-center">Fastest way to check in</span>
+            </button>
+            
+            <label className="group flex flex-col items-center p-8 bg-slate-50 border-2 border-dashed border-slate-300 rounded-xl hover:border-indigo-500 hover:bg-indigo-50/50 transition cursor-pointer">
+              <Upload size={48} className="text-slate-400 group-hover:text-indigo-600 mb-4 transition-colors" />
+              <span className="font-semibold text-slate-700 group-hover:text-indigo-900">Upload Photo</span>
+              <span className="text-xs text-slate-500 mt-2 text-center">From your device gallery</span>
+              <input type="file" accept="image/*" className="hidden" onChange={handleFileUpload} />
+            </label>
           </div>
-          <div className="flex gap-4">
-            <button onClick={() => setMode(null)} className="px-6 py-2 text-gray-600 bg-gray-200 rounded-full font-medium hover:bg-gray-300">Cancel</button>
-            <button onClick={handleCapture} className="px-6 py-2 text-white bg-emerald-600 rounded-full font-medium hover:bg-emerald-700">Capture Photo</button>
-          </div>
-        </div>
-      )}
+        )}
 
-      {/* Preview & Submit View */}
-      {mode === 'preview' && selectedFile && (
-        <div className="flex flex-col items-center text-center">
-          <CheckCircle size={48} className="text-emerald-500 mb-4" />
-          <p className="text-lg font-medium text-gray-700 mb-6">Photo ready for processing</p>
-          
-          {result ? (
-            <div className="p-4 bg-gray-100 rounded-lg w-full max-w-md text-left">
-              <pre className="text-sm overflow-x-auto text-emerald-900">{JSON.stringify(result, null, 2)}</pre>
-              <button onClick={() => { setMode(null); setResult(null); setSelectedFile(null); }} className="mt-4 text-emerald-600 font-medium underline">Try Again</button>
+        {mode === 'camera' && (
+          <div className="flex flex-col items-center animate-in fade-in zoom-in-95 duration-200">
+            <div className="rounded-xl overflow-hidden border-4 border-indigo-100 mb-6 shadow-inner bg-slate-900">
+              <Webcam
+                audio={false}
+                ref={webcamRef}
+                screenshotFormat="image/jpeg"
+                videoConstraints={{ facingMode: "user" }}
+                className="w-full max-w-md"
+              />
             </div>
-          ) : (
-            <div className="flex gap-4">
-               <button onClick={() => setMode(null)} className="px-6 py-2 text-gray-600 bg-gray-200 rounded-full font-medium hover:bg-gray-300">Retake</button>
-               <button onClick={submitToApi} disabled={loading} className="px-6 py-2 text-white bg-emerald-600 rounded-full font-medium hover:bg-emerald-700 disabled:bg-emerald-300">
-                 {loading ? 'Processing...' : 'Recognize Face'}
-               </button>
+            <div className="flex gap-4 w-full max-w-md">
+              <button onClick={() => setMode(null)} className="flex-1 py-3 text-slate-700 bg-slate-100 rounded-lg font-semibold hover:bg-slate-200">Cancel</button>
+              <button onClick={handleCapture} className="flex-1 py-3 text-white bg-indigo-600 rounded-lg font-semibold hover:bg-indigo-700 shadow-md hover:shadow-lg">Capture</button>
             </div>
-          )}
+          </div>
+        )}
+
+        {mode === 'preview' && selectedFile && (
+          <div className="flex flex-col items-center text-center animate-in fade-in zoom-in-95 duration-200">
+            <CheckCircle size={56} className="text-indigo-500 mb-4" />
+            <h3 className="text-xl font-bold text-slate-800 mb-2">Photo Ready</h3>
+            <p className="text-slate-600 mb-8">Initiate scan to retrieve your festival profile.</p>
+            
+            {result ? (
+              <div className="p-6 bg-slate-50 border border-slate-200 rounded-xl w-full max-w-md text-left shadow-inner">
+                <pre className="text-sm overflow-x-auto text-slate-800 font-mono">{JSON.stringify(result, null, 2)}</pre>
+                <button onClick={() => { setMode(null); setResult(null); setSelectedFile(null); }} className="mt-6 text-indigo-600 font-semibold hover:text-indigo-800 flex items-center gap-2">
+                  <span>←</span> Try Another Face
+                </button>
+              </div>
+            ) : (
+              <div className="flex gap-4 w-full max-w-md">
+                 <button onClick={() => setMode(null)} className="flex-1 py-3 text-slate-700 bg-slate-100 rounded-lg font-semibold hover:bg-slate-200">Retake</button>
+                 <button onClick={submitToApi} disabled={loading} className="flex-1 py-3 text-white bg-indigo-600 rounded-lg font-semibold hover:bg-indigo-700 shadow-md disabled:bg-indigo-400 disabled:shadow-none flex justify-center items-center gap-2">
+                   {loading ? (
+                     <><Zap className="animate-pulse" size={18} /> Processing...</>
+                   ) : (
+                     'Verify Identity'
+                   )}
+                 </button>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Info Highlights */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto pt-8 border-t border-slate-200">
+        <div className="flex flex-col items-center text-center p-4">
+          <div className="w-12 h-12 bg-indigo-100 text-indigo-700 rounded-full flex items-center justify-center mb-4">
+            <Zap size={24} />
+          </div>
+          <h3 className="font-bold text-slate-900 mb-2">Instant Results</h3>
+          <p className="text-sm text-slate-600">Ranks and grades published the moment judges submit. No waiting at notice boards.</p>
         </div>
-      )}
+        <div className="flex flex-col items-center text-center p-4">
+          <div className="w-12 h-12 bg-indigo-100 text-indigo-700 rounded-full flex items-center justify-center mb-4">
+            <Calendar size={24} />
+          </div>
+          <h3 className="font-bold text-slate-900 mb-2">Live Schedule</h3>
+          <p className="text-sm text-slate-600">Your personalised event timetable with venue and current status—always up to date.</p>
+        </div>
+        <div className="flex flex-col items-center text-center p-4">
+          <div className="w-12 h-12 bg-indigo-100 text-indigo-700 rounded-full flex items-center justify-center mb-4">
+            <Bell size={24} />
+          </div>
+          <h3 className="font-bold text-slate-900 mb-2">WhatsApp Alerts</h3>
+          <p className="text-sm text-slate-600">Get venue changes and 30-minute event reminders sent straight to your chat.</p>
+        </div>
+      </div>
+
     </div>
   );
 }

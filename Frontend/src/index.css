@@ -1,12 +1,10 @@
 @import "tailwindcss";
 
-@theme {
-  --color-brand-primary: var(--color-emerald-700);
-  --color-brand-hover: var(--color-emerald-600);
-  --color-brand-dark: var(--color-emerald-900);
-  --color-brand-light: var(--color-emerald-50);
+body {
+  @apply bg-slate-50 text-slate-900 antialiased;
 }
 
-body {
-  @apply bg-gray-50 text-gray-900 antialiased;
+/* Optional: Smooth transitions for all interactive elements */
+button, a {
+  @apply transition-all duration-200 ease-in-out;
 }
