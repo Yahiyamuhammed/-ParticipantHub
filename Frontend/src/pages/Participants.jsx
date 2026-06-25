@@ -11,12 +11,15 @@ export default function Participants() {
     verificationApi.getParticipants()
       .then(data => {
         // Parse JSON if API returns a string encoded array
-        setParticipants(typeof data === 'string' ? JSON.parse(data) : data);
+        const parsedData = typeof data === 'string' ? JSON.parse(data) : data;
+        // Target the .participants array inside the response object
+        setParticipants(parsedData.participants || []);
       })
       .catch(err => console.error('Failed to fetch participants:', err))
       .finally(() => setLoading(false));
   }, []);
 
+  // This is the line that was missing! It filters the array based on the search bar.
   const filteredParticipants = Array.isArray(participants) ? participants.filter(p => 
     p.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     p.district?.toLowerCase().includes(searchQuery.toLowerCase())
@@ -48,17 +51,25 @@ export default function Participants() {
         <div className="text-center py-12 bg-white border rounded-xl text-gray-400">No participants found.</div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredParticipants.map((user, index) => (
-            <div key={user.id || index} className="bg-white p-5 rounded-xl border border-gray-100 shadow-xs flex flex-col justify-between">
+          {filteredParticipants.map((user) => (
+            <div key={user.id} className="bg-white p-5 rounded-xl border border-gray-100 shadow-xs flex flex-col justify-between">
               <div>
-                <h3 className="font-bold text-gray-800 text-lg mb-2">{user.name}</h3>
+                <div className="flex justify-between items-start mb-2">
+                  <h3 className="font-bold text-gray-800 text-lg">{user.name}</h3>
+                  {user.status && (
+                    <span className="bg-emerald-100 text-emerald-800 text-xs px-2 py-1 rounded-md font-medium capitalize">
+                      {user.status.replace('_', ' ')}
+                    </span>
+                  )}
+                </div>
                 <div className="space-y-1 text-sm text-gray-600">
                   <p className="flex items-center gap-2"><MapPin size={14} className="text-emerald-600" /> {user.district}</p>
                   <p className="flex items-center gap-2"><Mail size={14} className="text-emerald-600" /> {user.email || 'N/A'}</p>
                 </div>
               </div>
               <div className="mt-4 pt-3 border-t border-gray-50 flex justify-between text-xs text-gray-400">
-                <span>ID: {user.id || index + 1}</span>
+                <span>ID: {user.id}</span>
+                <span>{new Date(user.created_at).toLocaleDateString()}</span>
               </div>
             </div>
           ))}
