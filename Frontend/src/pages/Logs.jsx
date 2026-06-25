@@ -1,17 +1,22 @@
-import { useEffect, useState } from 'react';
-import { ClipboardList, Clock, CheckCircle, AlertTriangle } from 'lucide-react';
-import { verificationApi } from '../api/client';
+import { useEffect, useState } from "react";
+import { ClipboardList, Clock, CheckCircle, AlertTriangle } from "lucide-react";
+import { verificationApi } from "../api/client";
 
 export default function Logs() {
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Replace your existing useEffect in Logs.jsx with this:
+
   useEffect(() => {
-    verificationApi.getLogs()
-      .then(data => {
-        setLogs(typeof data === 'string' ? JSON.parse(data) : data);
+    verificationApi
+      .getLogs()
+      .then((data) => {
+        // Target the .logs array inside the response object
+        const parsedData = typeof data === "string" ? JSON.parse(data) : data;
+        setLogs(parsedData.logs || []);
       })
-      .catch(err => console.error('Failed to load logs:', err))
+      .catch((err) => console.error("Failed to load logs:", err))
       .finally(() => setLoading(false));
   }, []);
 
@@ -19,13 +24,19 @@ export default function Logs() {
     <div className="space-y-6">
       <div className="flex items-center gap-3">
         <ClipboardList className="text-emerald-700 w-8 h-8" />
-        <h1 className="text-2xl font-bold text-gray-800">Recognition Activity Logs</h1>
+        <h1 className="text-2xl font-bold text-gray-800">
+          Recognition Activity Logs
+        </h1>
       </div>
 
       {loading ? (
-        <div className="text-center py-12 text-gray-500">Loading access logs...</div>
+        <div className="text-center py-12 text-gray-500">
+          Loading access logs...
+        </div>
       ) : !Array.isArray(logs) || logs.length === 0 ? (
-        <div className="text-center py-12 bg-white border rounded-xl text-gray-400">No activity logs recorded yet.</div>
+        <div className="text-center py-12 bg-white border rounded-xl text-gray-400">
+          No activity logs recorded yet.
+        </div>
       ) : (
         <div className="bg-white border border-gray-100 rounded-xl shadow-xs overflow-hidden">
           <div className="overflow-x-auto">
@@ -38,26 +49,35 @@ export default function Logs() {
                   <th className="px-6 py-3.5">Confidence</th>
                 </tr>
               </thead>
+
               <tbody className="divide-y divide-gray-100 text-sm text-gray-700">
-                {logs.map((log, index) => {
-                  const isSuccess = log.status?.toLowerCase() !== 'failed' && log.matched_name;
+                {logs.map((log) => {
+                  const isSuccess = log.status?.toLowerCase() === "success";
                   return (
-                    <tr key={log.id || index} className="hover:bg-gray-50/50 transition">
+                    <tr key={log.id} className="hover:bg-gray-50/50 transition">
                       <td className="px-6 py-4 whitespace-nowrap text-gray-500 flex items-center gap-2">
                         <Clock size={14} className="text-gray-400" />
-                        {log.timestamp ? new Date(log.timestamp).toLocaleString() : 'Recent'}
+                        {new Date(log.timestamp).toLocaleString()}
                       </td>
                       <td className="px-6 py-4 font-medium text-gray-900">
-                        {log.matched_name || log.name || 'Unknown Face'}
+                        Participant ID: {log.participant_id}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${isSuccess ? 'bg-emerald-50 text-emerald-800' : 'bg-amber-50 text-amber-800'}`}>
-                          {isSuccess ? <CheckCircle size={12} /> : <AlertTriangle size={12} />}
-                          {isSuccess ? 'Verified' : 'Unrecognized'}
+                        <span
+                          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${isSuccess ? "bg-emerald-50 text-emerald-800" : "bg-red-50 text-red-800"}`}
+                        >
+                          {isSuccess ? (
+                            <CheckCircle size={12} />
+                          ) : (
+                            <AlertTriangle size={12} />
+                          )}
+                          {isSuccess ? "Success" : "Failed"}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap font-mono text-xs text-gray-500">
-                        {log.confidence ? `${(log.confidence * 100).toFixed(1)}%` : 'N/A'}
+                        {log.confidence
+                          ? `${(log.confidence * 100).toFixed(1)}%`
+                          : "N/A"}
                       </td>
                     </tr>
                   );
