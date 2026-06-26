@@ -1,0 +1,10 @@
+@import "tailwindcss";
+
+body {
+  @apply bg-slate-50 text-slate-900 antialiased;
+}
+
+/* Optional: Smooth transitions for all interactive elements */
+button, a {
+  @apply transition-all duration-200 ease-in-out;
+}
