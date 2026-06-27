@@ -1,5 +1,11 @@
 import os
 from pathlib import Path
+from dotenv import load_dotenv
+load_dotenv()
+
+WHATSAPP_TOKEN = os.getenv("WHATSAPP_TOKEN")
+WHATSAPP_PHONE_ID = os.getenv("WHATSAPP_PHONE_ID")
+WHATSAPP_API_URL = "https://graph.facebook.com/v17.0"
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_DIR = os.path.join(BASE_DIR, 'data')
