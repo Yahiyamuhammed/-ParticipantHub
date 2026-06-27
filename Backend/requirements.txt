@@ -4,3 +4,4 @@ numpy
 pydantic
 insightface
 uvicorn
+python-dotenv
