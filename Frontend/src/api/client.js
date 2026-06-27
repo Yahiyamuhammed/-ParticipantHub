@@ -38,6 +38,12 @@ export const verificationApi = {
   getLogs: async () => {
     const response = await apiClient.get('/api/verification/logs');
     return response.data;
+  },
+  // Add to verificationApi object in src/api/client.js
+  sendWhatsApp: async (endpoint, data) => {
+    // endpoint example: 'order-confirmation', 'hello', or 'plain-alert'
+    const response = await apiClient.post(`/api/notifications/${endpoint}`, data);
+    return response.data;
   }
 };
 
