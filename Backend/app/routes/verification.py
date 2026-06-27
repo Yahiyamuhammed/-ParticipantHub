@@ -65,7 +65,14 @@ async def recognize_face(photo: UploadFile = File(...)):
             content = await photo.read()
             f.write(content)
         
-        best_match_id, confidence, top_5 = face_service.recognize_face(temp_path)
+        # 1. Create a quick lookup map of {id: name} from your in-memory participants dict
+        id_to_name_map = {pid: p.name for pid, p in participants.items()}
+        
+        # 2. Pass the map into the service method
+        best_match_id, confidence, top_5 = face_service.recognize_face(
+            temp_path, 
+            id_to_name_map=id_to_name_map
+        )
         
         if os.path.exists(temp_path):
             os.remove(temp_path)
@@ -95,7 +102,7 @@ async def recognize_face(photo: UploadFile = File(...)):
             },
             "confidence": confidence,
             "percentage": f"{confidence * 100:.1f}%",
-            "top_5_matches": top_5
+            "top_5_matches": top_5  # This will now include names!
         }
     
     except Exception as e:
