@@ -11,6 +11,7 @@ export default function Layout() {
     { name: 'Register', path: '/register' },
     { name: 'Participants', path: '/participants' },
     { name: 'Logs', path: '/logs' },
+    { name: 'WhatsApp Test', path: '/whatsapp-test' },
   ];
 
   return (
