@@ -4,6 +4,7 @@ import Recognize from './pages/Recognize';
 import Register from './pages/Register';
 import Participants from './pages/Participants';
 import Logs from './pages/Logs';
+import WhatsAppTester from './pages/WhatsAppTester';
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
           <Route path="register" element={<Register />} />
           <Route path="participants" element={<Participants />} />
           <Route path="logs" element={<Logs />} />
+          <Route path="whatsapp-test" element={<WhatsAppTester />} />
         </Route>
       </Routes>
     </BrowserRouter>
