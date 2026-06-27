@@ -110,7 +110,8 @@ class FaceRecognitionService:
     
     def recognize_face(
         self,
-        test_image_path: str
+        test_image_path: str,
+        id_to_name_map: Optional[dict] = None  # <-- Add this parameter
     ) -> Tuple[Optional[int], float, List[dict]]:
         """
         Recognize face from image
@@ -156,10 +157,11 @@ class FaceRecognitionService:
             best_match_id = top_5[0][0]
             best_confidence = top_5[0][1]
             
-            # Format top 5
+            # Format top 5 (Modified to include name if available)
             top_5_matches = [
                 {
                     "participant_id": pid,
+                    "name": id_to_name_map.get(pid, "Unknown") if id_to_name_map else "Unknown",
                     "confidence": conf,
                     "percentage": f"{conf * 100:.1f}%"
                 }
