@@ -5,22 +5,32 @@ from app.services.whatsapp_service import WhatsAppService
 router = APIRouter(prefix="/api/notifications", tags=["notifications"])
 whatsapp_service = WhatsAppService()
 
-class WhatsAppMessage(BaseModel):
-    phone_number: str
-    template_name: str
-    components: list  # List of variables to fill {{1}}, {{2}}...
+class OrderData(BaseModel):
+    phone: str
+    name: str
+    order_id: str
+    date: str
 
-@router.post("/send")
-async def send_notification(message: WhatsAppMessage):
-    try:
-        response = whatsapp_service._send_template(
-            to_phone=message.phone_number,
-            template_name=message.template_name,
-            components=message.components
-        )
-        if response.status_code == 200:
-            return {"success": True, "message": "Notification sent!"}
-        else:
-            raise HTTPException(status_code=response.status_code, detail=response.text)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+class SimpleData(BaseModel):
+    phone: str
+
+@router.post("/order-confirmation")
+async def notify_order(data: OrderData):
+    response = whatsapp_service.send_order_confirmation(data.phone, data.name, data.order_id, data.date)
+    if response.status_code != 200:
+        raise HTTPException(status_code=400, detail=response.json())
+    return {"success": True}
+
+@router.post("/hello")
+async def notify_hello(data: SimpleData):
+    response = whatsapp_service.send_hello(data.phone)
+    if response.status_code != 200:
+        raise HTTPException(status_code=400, detail=response.json())
+    return {"success": True}
+
+@router.post("/plain-alert")
+async def notify_plain(data: SimpleData):
+    response = whatsapp_service.send_plain_text(data.phone)
+    if response.status_code != 200:
+        raise HTTPException(status_code=400, detail=response.json())
+    return {"success": True}
