@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.config import API_TITLE, API_VERSION, API_DESCRIPTION
-from app.routes import verification
+from app.routes import verification, notifications
 
 app = FastAPI(
     title=API_TITLE,
@@ -18,6 +18,7 @@ app.add_middleware(
 )
 
 app.include_router(verification.router)
+app.include_router(notifications.router)
 
 
 @app.get("/")
