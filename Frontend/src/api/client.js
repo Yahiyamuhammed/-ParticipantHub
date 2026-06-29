@@ -36,7 +36,12 @@ export const verificationApi = {
   sendWhatsApp: async (endpoint, data) => {
     const response = await apiClient.post(`/api/notifications/${endpoint}`, data);
     return response.data;
-  }
+  },
+
+  deleteParticipant: async (userId) => {
+    const response = await apiClient.delete(`/api/verification/user/${userId}`);
+    return response.data;
+  },
 };
 
 export default apiClient;
