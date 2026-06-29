@@ -12,8 +12,7 @@ export default function Participants() {
       .then(data => {
         // Parse JSON if API returns a string encoded array
         const parsedData = typeof data === 'string' ? JSON.parse(data) : data;
-        // Target the .participants array inside the response object
-        setParticipants(parsedData.participants || []);
+                setParticipants(parsedData.users || []);
       })
       .catch(err => console.error('Failed to fetch participants:', err))
       .finally(() => setLoading(false));
