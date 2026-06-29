@@ -1,16 +1,21 @@
-import insightface
-import numpy as np
 import cv2
-from typing import Tuple, List, Optional
+import numpy as np
+import insightface
+from typing import Optional, Tuple, List
 from sqlalchemy.orm import Session
 from app.models.user import User
 
 class FaceRecognitionService:
     def __init__(self):
         try:
-            self.model = insightface.app.FaceAnalysis(name='buffalo_l')
+            # OPTIMIZATION: Only load the specific modules required for verification.
+            # This cuts down RAM usage by more than half.
+            self.model = insightface.app.FaceAnalysis(
+                name='buffalo_l',
+                allowed_modules=['detection', 'recognition']
+            )
             self.model.prepare(ctx_id=0, det_size=(640, 480))
-            print("✓ InsightFace model loaded")
+            print("✓ InsightFace model loaded (Memory-Optimized Mode)")
         except Exception as e:
             print(f"✗ Error loading model: {e}")
             self.model = None
@@ -33,7 +38,7 @@ class FaceRecognitionService:
             return embedding
         
         except Exception as e:
-
+            print(f"✗ Error extracting embedding: {e}")
             return None
     
     def recognize_face(self, test_image_path: str, db: Session) -> Tuple[Optional[dict], float, List[dict]]:
@@ -51,6 +56,8 @@ class FaceRecognitionService:
             scores = {}
             for user in db_users:
                 try:
+                    if not user.embedding:
+                        continue
                     # Load embedding FROM DATABASE
                     saved_embedding = np.frombuffer(user.embedding, dtype=np.float32)
                     
@@ -63,7 +70,7 @@ class FaceRecognitionService:
                         "confidence": float(similarity)
                     }
                 except Exception as e:
-                    print(f"✗ Error: {e}")
+                    print(f"✗ Error processing match for user {user.id}: {e}")
                     continue
             
             if not scores:
@@ -88,5 +95,5 @@ class FaceRecognitionService:
             return best_user.to_dict(), best_confidence, top_5_matches
         
         except Exception as e:
-
+            print(f"✗ Recognition process crashed: {e}")
             return None, 0.0, []
