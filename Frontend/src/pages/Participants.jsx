@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Users, Search, MapPin, Mail } from 'lucide-react';
+import { Users, Search, MapPin, Mail, Trash2 } from 'lucide-react'; // ✅ Imported Trash2
 import { verificationApi } from '../api/client';
 
 export default function Participants() {
@@ -10,16 +10,30 @@ export default function Participants() {
   useEffect(() => {
     verificationApi.getParticipants()
       .then(data => {
-        // Parse JSON if API returns a string encoded array
         const parsedData = typeof data === 'string' ? JSON.parse(data) : data;
-        // Target the .participants array inside the response object
-        setParticipants(parsedData.participants || []);
+        setParticipants(parsedData.users || []);
       })
       .catch(err => console.error('Failed to fetch participants:', err))
       .finally(() => setLoading(false));
   }, []);
 
-  // This is the line that was missing! It filters the array based on the search bar.
+  const handleDelete = async (userId) => {
+    if (!window.confirm('Are you sure you want to delete this participant?')) return;
+    
+    try {
+      const response = await verificationApi.deleteParticipant(userId);
+      if (response.success) {
+        // Remove the user locally from the state array
+        setParticipants(prev => prev.filter(user => user.id !== userId));
+      } else {
+        alert(response.message || 'Could not delete user.');
+      }
+    } catch (err) {
+      console.error('Failed to delete user:', err);
+      alert('An error occurred while deleting the participant.');
+    }
+  };
+
   const filteredParticipants = Array.isArray(participants) ? participants.filter(p => 
     p.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     p.district?.toLowerCase().includes(searchQuery.toLowerCase())
@@ -56,11 +70,20 @@ export default function Participants() {
               <div>
                 <div className="flex justify-between items-start mb-2">
                   <h3 className="font-bold text-gray-800 text-lg">{user.name}</h3>
-                  {user.status && (
-                    <span className="bg-emerald-100 text-emerald-800 text-xs px-2 py-1 rounded-md font-medium capitalize">
-                      {user.status.replace('_', ' ')}
-                    </span>
-                  )}
+                  <div className="flex items-center gap-2">
+                    {user.status && (
+                      <span className="bg-emerald-100 text-emerald-800 text-xs px-2 py-1 rounded-md font-medium capitalize">
+                        {user.status.replace('_', ' ')}
+                      </span>
+                    )}
+                    <button 
+                      onClick={() => handleDelete(user.id)}
+                      className="text-gray-400 hover:text-red-600 transition-colors p-1 rounded-md hover:bg-red-50"
+                      title="Delete Participant"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
                 </div>
                 <div className="space-y-1 text-sm text-gray-600">
                   <p className="flex items-center gap-2"><MapPin size={14} className="text-emerald-600" /> {user.district}</p>
@@ -69,7 +92,7 @@ export default function Participants() {
               </div>
               <div className="mt-4 pt-3 border-t border-gray-50 flex justify-between text-xs text-gray-400">
                 <span>ID: {user.id}</span>
-                <span>{new Date(user.created_at).toLocaleDateString()}</span>
+                <span>{user.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A'}</span>
               </div>
             </div>
           ))}

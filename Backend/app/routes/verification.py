@@ -1,133 +1,131 @@
-from fastapi import APIRouter, File, UploadFile
+from fastapi import APIRouter, File, UploadFile, Depends
+from sqlalchemy.orm import Session
+import numpy as np
 import os
-from app.config import PARTICIPANTS_DIR
+import uuid
+from app.database import get_db
+from app.models.user import User
 from app.services.face_service import FaceRecognitionService
-from app.models.participant import Participant, Recognition
 
-router = APIRouter(prefix="/api/verification", tags=["verification"])
-
+router = APIRouter()
 face_service = FaceRecognitionService()
 
-participants = {}
-recognitions = []
-participant_counter = 0
-
+TEMP_DIR = "data/temp"
+os.makedirs(TEMP_DIR, exist_ok=True)
 
 @router.post("/register")
 async def register_participant(
     name: str,
     district: str,
     email: str,
-    photo: UploadFile = File(...)
+    photo: UploadFile = File(...),
+    db: Session = Depends(get_db)
 ):
+    """Register and save to DATABASE (not files!)"""
     try:
-        global participant_counter
-        participant_counter += 1
-        participant_id = participant_counter
+        # Check if email exists
+        if db.query(User).filter(User.email == email).first():
+            return {"success": False, "message": "Email already registered"}
         
-        photo_path = os.path.join(PARTICIPANTS_DIR, f"{participant_id}_{photo.filename}")
-        with open(photo_path, "wb") as f:
-            content = await photo.read()
-            f.write(content)
+        # Save temp photo
+        temp_path = f"{TEMP_DIR}/{uuid.uuid4()}.jpg"
+        with open(temp_path, "wb") as f:
+            f.write(await photo.read())
         
-        participant = Participant(
-            id=participant_id,
+        # Extract embedding
+        embedding = face_service.extract_embedding(temp_path)
+        
+        # DELETE PHOTO (we only need embedding!)
+        os.remove(temp_path)
+        
+        if embedding is None:
+            return {"success": False, "message": "No face detected"}
+        
+        # Convert to bytes
+        embedding_bytes = embedding.astype(np.float32).tobytes()
+        
+        # SAVE TO DATABASE (NOT FILES!)
+        new_user = User(
             name=name,
             district=district,
             email=email,
-            photo_path=photo_path
+            embedding=embedding_bytes  # ← IN DATABASE!
         )
-        participants[participant_id] = participant
         
-        embedding = face_service.extract_embedding(photo_path)
-        
-        if embedding is None:
-            return {"success": False, "message": "No face detected in photo"}
-        
-        face_service.save_embedding(participant_id, embedding)
+        db.add(new_user)
+        db.commit()
+        db.refresh(new_user)
         
         return {
             "success": True,
-            "message": f"{name} registered successfully",
-            "participant_id": participant_id,
-            "participant": participant.to_dict()
+            "message": f"{name} registered!",
+            "user_id": new_user.id,
+            "user": new_user.to_dict()
         }
     
     except Exception as e:
-        return {"success": False, "message": f"Error: {str(e)}"}
-
+        db.rollback()
+        return {"success": False, "message": str(e)}
 
 @router.post("/recognize")
-async def recognize_face(photo: UploadFile = File(...)):
+async def recognize_face(
+    photo: UploadFile = File(...),
+    db: Session = Depends(get_db)
+):
+    """Recognize and search DATABASE (not files!)"""
     try:
-        temp_path = os.path.join(PARTICIPANTS_DIR, f"temp_{photo.filename}")
+        # Save temp photo
+        temp_path = f"{TEMP_DIR}/{uuid.uuid4()}.jpg"
         with open(temp_path, "wb") as f:
-            content = await photo.read()
-            f.write(content)
+            f.write(await photo.read())
         
-        # 1. Create a quick lookup map of {id: name} from your in-memory participants dict
-        id_to_name_map = {pid: p.name for pid, p in participants.items()}
+        # Recognize FROM DATABASE
+        user_data, confidence, top_5 = face_service.recognize_face(temp_path, db)
         
-        # 2. Pass the map into the service method
-        best_match_id, confidence, top_5 = face_service.recognize_face(
-            temp_path, 
-            id_to_name_map=id_to_name_map
-        )
+        # DELETE PHOTO
+        os.remove(temp_path)
         
-        if os.path.exists(temp_path):
-            os.remove(temp_path)
-        
-        if best_match_id is None:
+        if user_data is None:
             return {"success": False, "message": "Face not recognized"}
-        
-        participant = participants.get(best_match_id)
-        
-        if not participant:
-            return {"success": False, "message": "Participant not found"}
-        
-        recognition = Recognition(participant_id=best_match_id, confidence=confidence, status="success")
-        recognitions.append(recognition)
-        
-        participant.status = "checked_in"
         
         return {
             "success": True,
             "message": "Face recognized!",
-            "participant": {
-                "id": participant.id,
-                "name": participant.name,
-                "district": participant.district,
-                "email": participant.email,
-                "status": participant.status
-            },
+            "user": user_data,
             "confidence": confidence,
             "percentage": f"{confidence * 100:.1f}%",
-            "top_5_matches": top_5  # This will now include names!
+            "top_5_matches": top_5
         }
     
     except Exception as e:
-        return {"success": False, "message": f"Error: {str(e)}"}
+        return {"success": False, "message": str(e)}
 
+@router.get("/users")
+async def get_all_users(db: Session = Depends(get_db)):
+    """Get all users FROM DATABASE"""
+    users = db.query(User).all()
+    return {
+        "success": True,
+        "count": len(users),
+        "users": [u.to_dict() for u in users]
+    }
 
-@router.get("/participants")
-async def get_all_participants():
-    try:
-        return {
-            "success": True,
-            "count": len(participants),
-            "participants": [p.to_dict() for p in participants.values()]
-        }
-    except Exception as e:
-        return {"success": False, "message": f"Error: {str(e)}"}
+@router.get("/user/{user_id}")
+async def get_user(user_id: int, db: Session = Depends(get_db)):
+    """Get user FROM DATABASE"""
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        return {"success": False, "message": "Not found"}
+    return {"success": True, "user": user.to_dict()}
 
-
-@router.get("/logs")
-async def get_recognition_logs():
-    try:
-        return {
-            "success": True,
-            "count": len(recognitions),
-            "logs": [r.to_dict() for r in recognitions]
-        }
-    except Exception as e:
-        return {"success": False, "message": f"Error: {str(e)}"}
+@router.delete("/user/{user_id}")
+async def delete_user(user_id: int, db: Session = Depends(get_db)):
+    """Delete user FROM DATABASE"""
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        return {"success": False, "message": "Not found"}
+    
+    db.delete(user)
+    db.commit()
+    
+    return {"success": True, "message": f"User deleted"}

@@ -10,7 +10,6 @@ export default function Layout() {
     { name: 'Recognize Face', path: '/' },
     { name: 'Register', path: '/register' },
     { name: 'Participants', path: '/participants' },
-    { name: 'Logs', path: '/logs' },
     { name: 'WhatsApp Test', path: '/whatsapp-test' },
   ];
 
