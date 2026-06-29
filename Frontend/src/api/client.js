@@ -16,7 +16,7 @@ export const verificationApi = {
     return response.data;
   },
 
-  // Register Participant (query parameters for text, form-data for photo)
+
   register: async (name, district, email, photoFile) => {
     const formData = new FormData();
     formData.append('photo', photoFile);
@@ -28,20 +28,12 @@ export const verificationApi = {
     return response.data;
   },
 
-  // Get Participants
   getParticipants: async () => {
-    const response = await apiClient.get('/api/verification/participants');
+    const response = await apiClient.get('/api/verification/users');
     return response.data;
   },
 
-  // Get Logs
-  getLogs: async () => {
-    const response = await apiClient.get('/api/verification/logs');
-    return response.data;
-  },
-  // Add to verificationApi object in src/api/client.js
   sendWhatsApp: async (endpoint, data) => {
-    // endpoint example: 'order-confirmation', 'hello', or 'plain-alert'
     const response = await apiClient.post(`/api/notifications/${endpoint}`, data);
     return response.data;
   }
