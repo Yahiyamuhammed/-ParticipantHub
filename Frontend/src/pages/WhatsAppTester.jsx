@@ -44,8 +44,8 @@ export default function WhatsAppTester() {
       
       <label className="block text-sm font-medium mb-1">Select User</label>
       <select className="w-full p-2 border rounded mb-3" onChange={handleUserChange}>
-        <option value="yahiya">Yahiya (+91 95265 15290)</option>
-        <option value="shammas">Shammas (+91 80-78589330)</option>
+        <option value="yahiya">Yahiya</option>
+        <option value="shammas">Shammas</option>
       </select>
 
       <label className="block text-sm font-medium mb-1">Endpoint</label>
