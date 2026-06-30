@@ -1,14 +1,11 @@
 import clsx from "clsx";
 
 const variants = {
-  primary:
-    "bg-blue-600 text-white hover:bg-blue-700",
+  primary: "bg-blue-600 text-white hover:bg-blue-700",
 
-  secondary:
-    "bg-gray-100 text-gray-800 hover:bg-gray-200",
+  secondary: "bg-gray-100 text-gray-800 hover:bg-gray-200",
 
-  outline:
-    "border border-gray-300 bg-white hover:bg-gray-50",
+  outline: "border border-gray-300 bg-white hover:bg-gray-50",
 };
 
 function Button({
@@ -22,9 +19,10 @@ function Button({
     <button
       type={type}
       className={clsx(
-        "w-full rounded-2xl px-5 py-3 font-medium transition",
+        "inline-flex w-full items-center justify-center gap-2 rounded-2xl px-5 py-3 font-medium transition-all duration-200",
+        "disabled:cursor-not-allowed disabled:opacity-50",
         variants[variant],
-        className
+        className,
       )}
       {...props}
     >
