@@ -6,11 +6,22 @@ import useCompetitions from "@/hooks/useCompetitions";
 import CompetitionCard from "@/components/shared/CompetitionCard";
 import { getEventStatus } from "@/utils/time";
 import { CardSkeleton } from "@/components/common/Skeleton";
+import { useLocation } from "react-router-dom";
+import { useRef, useEffect } from "react";
 
 export default function ExplorePage() {
   const navigate = useNavigate();
   const { competitions, isLoading } = useCompetitions();
   const [searchQuery, setSearchQuery] = useState("");
+  const location = useLocation();
+  const searchInputRef = useRef(null);
+  
+  useEffect(() => {
+    // If navigated from the Landing page's Search button, focus immediately
+    if (location.state?.autoFocusSearch && searchInputRef.current) {
+      searchInputRef.current.focus();
+    }
+  }, [location.state]);
 
   // Group and filter competitions based on time and search query
   const { live, soon, upcoming } = useMemo(() => {
@@ -57,6 +68,7 @@ export default function ExplorePage() {
           <SearchIcon className="h-5 w-5 text-gray-400" />
         </div>
         <input
+        ref={searchInputRef}
           type="text"
           placeholder="Search competitions or stages..."
           value={searchQuery}

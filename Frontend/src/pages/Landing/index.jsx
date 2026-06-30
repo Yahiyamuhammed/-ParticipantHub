@@ -47,8 +47,7 @@ export default function LandingPage() {
           <p className="text-xs text-gray-500 mt-1">Live & Upcoming</p>
         </Card>
 
-        <Card onClick={() => { /* Open Search Modal later */ }} className="flex flex-col items-center justify-center py-6 text-center">
-          <Search className="w-8 h-8 text-green-600 mb-3" />
+<Card onClick={() => navigate("/explore", { state: { autoFocusSearch: true } })} className="flex flex-col items-center justify-center py-6 text-center">          <Search className="w-8 h-8 text-green-600 mb-3" />
           <h3 className="font-medium text-gray-900">Search</h3>
           <p className="text-xs text-gray-500 mt-1">Find a competition</p>
         </Card>
