@@ -1,11 +1,11 @@
-// src/features/auth/components/FaceAuth.jsx
+// src/features/auth/components/FaceAuth.jsx (Updated Snippet)
 import React, { useRef, useState, useCallback } from "react";
 import Webcam from "react-webcam";
 import { useAuth } from "@/context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { Camera, AlertCircle, User, ChevronRight } from "lucide-react";
 import Button from "@/components/common/Button";
 import Card from "@/components/common/Card";
-import { Camera, AlertCircle } from "lucide-react";
 
 export default function FaceAuth({ onFailure, onSwitchToManual }) {
   const webcamRef = useRef(null);
@@ -15,10 +15,15 @@ export default function FaceAuth({ onFailure, onSwitchToManual }) {
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState(null);
   const [cameraPermission, setCameraPermission] = useState(true);
+  const [possibleMatches, setPossibleMatches] = useState([]); // NEW STATE
+
+  const handleProfileSelect = (profile) => {
+    login(profile);
+    navigate("/dashboard");
+  };
 
   const captureAndAuthenticate = useCallback(() => {
     if (!webcamRef.current) return;
-    
     setIsProcessing(true);
     setError(null);
     
@@ -26,18 +31,62 @@ export default function FaceAuth({ onFailure, onSwitchToManual }) {
     
     // MOCK API CALL
     setTimeout(() => {
-      // Simulate an 80% chance of success for testing
-      if (Math.random() > 0.2) {
-        login({ id: "P-1023", name: "Yahiya Muhammed", reg: "SSF00125" });
-        navigate("/dashboard");
+      setIsProcessing(false);
+      const rand = Math.random();
+      
+      if (rand > 0.6) {
+        // High Confidence -> Direct Login
+        handleProfileSelect({ id: "P-1023", name: "Yahiya Muhammed", reg: "SSF00125", district: "Nadapuram" });
+      } else if (rand > 0.3) {
+        // Low Confidence -> Show Multiple Matches
+        setPossibleMatches([
+          { id: "P-1023", name: "Yahiya Muhammed", reg: "SSF00125", district: "Nadapuram" },
+          { id: "P-1088", name: "Yahya Ali", reg: "SSF00921", district: "Kozhikode" },
+          { id: "P-2011", name: "Mohammed Yahiya", reg: "SSF00444", district: "Kannur" }
+        ]);
       } else {
-        setIsProcessing(false);
+        // No Face Found
         setError("We couldn't detect your face clearly. Please try again in better lighting.");
         onFailure();
       }
     }, 1500);
   }, [webcamRef, login, navigate, onFailure]);
 
+  // --- NEW UI: MATCH SELECTION SCREEN ---
+  if (possibleMatches.length > 0) {
+    return (
+      <div className="flex flex-col animate-in fade-in slide-in-from-bottom-4 duration-300">
+        <h2 className="text-2xl font-bold mb-2">Is this you?</h2>
+        <p className="text-gray-500 mb-6 text-sm">
+          We found multiple partial matches. Please select your profile.
+        </p>
+        <div className="space-y-3">
+          {possibleMatches.map((profile) => (
+            <Card 
+              key={profile.id} 
+              onClick={() => handleProfileSelect(profile)}
+              padding="p-4"
+              className="flex items-center justify-between"
+            >
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-gray-500 font-bold">
+                  {profile.name.charAt(0)}
+                </div>
+                <div>
+                  <h4 className="font-semibold text-gray-900">{profile.name}</h4>
+                  <p className="text-xs text-gray-500">{profile.reg} • {profile.district}</p>
+                </div>
+              </div>
+              <ChevronRight className="w-5 h-5 text-gray-300" />
+            </Card>
+          ))}
+        </div>
+        <Button variant="secondary" onClick={() => setPossibleMatches([])} className="mt-6">
+          Scan Again
+        </Button>
+      </div>
+    );
+  }
   if (!cameraPermission) {
     return (
       <Card className="flex flex-col items-center justify-center p-8 text-center mt-10">

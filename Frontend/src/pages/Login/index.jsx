@@ -1,66 +1,50 @@
-// src/pages/Landing/index.jsx
-import React from "react";
+// src/pages/Login/index.jsx
+import React, { useState } from "react";
+import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { ScanFace, Search, Compass, Trophy } from "lucide-react";
-import Section from "@/components/common/Section";
-import Card from "@/components/common/Card";
-import Leaderboard from "@/features/landing/components/Leaderboard";
+import FaceAuth from "@/features/auth/components/FaceAuth";
+import RegAuth from "@/features/auth/components/RegAuth";
 
-export default function LandingPage() {
+export default function LoginPage() {
   const navigate = useNavigate();
+  // 'face' | 'manual'
+  const [authMethod, setAuthMethod] = useState("face"); 
+  const [failedAttempts, setFailedAttempts] = useState(0);
+
+  const handleFaceFailure = () => {
+    const newAttempts = failedAttempts + 1;
+    setFailedAttempts(newAttempts);
+    if (newAttempts >= 2) {
+      setAuthMethod("manual");
+    }
+  };
 
   return (
-    <div className="flex flex-col gap-8 pb-12">
-      {/* Header */}
-      <header className="pt-8">
-        <h1 className="text-3xl font-bold tracking-tight text-gray-900">
-          Sahitya Sabha
-        </h1>
-        <p className="mt-2 text-gray-500">
-          Participant Hub & Live Event Updates
-        </p>
+    <div className="flex flex-col min-h-screen bg-gray-50 -mx-5 px-5">
+      {/* Back Navigation */}
+      <header className="py-6">
+        <button 
+          onClick={() => navigate("/")}
+          className="flex items-center text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
+        >
+          <ArrowLeft className="w-4 h-4 mr-1" />
+          Back
+        </button>
       </header>
 
-      {/* Primary Action: Login */}
-      <Section>
-        <Card 
-          onClick={() => navigate("/login")}
-          className="bg-gray-900 text-white hover:bg-gray-800 ring-0"
-        >
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-lg font-semibold">Participant Login</h2>
-              <p className="mt-1 text-sm text-gray-400">Scan face or enter Reg No.</p>
-            </div>
-            <div className="bg-white/10 p-3 rounded-full">
-              <ScanFace className="w-6 h-6 text-white" />
-            </div>
-          </div>
-        </Card>
-      </Section>
-
-      {/* Secondary Actions Grid */}
-      <div className="grid grid-cols-2 gap-4">
-        <Card onClick={() => navigate("/explore")} className="flex flex-col items-center justify-center py-6 text-center">
-          <Compass className="w-8 h-8 text-blue-600 mb-3" />
-          <h3 className="font-medium text-gray-900">Explore Events</h3>
-          <p className="text-xs text-gray-500 mt-1">Live & Upcoming</p>
-        </Card>
-
-        <Card onClick={() => { /* Open Search Modal later */ }} className="flex flex-col items-center justify-center py-6 text-center">
-          <Search className="w-8 h-8 text-green-600 mb-3" />
-          <h3 className="font-medium text-gray-900">Search</h3>
-          <p className="text-xs text-gray-500 mt-1">Find a competition</p>
-        </Card>
+      <div className="flex-1 flex flex-col pt-4">
+        {authMethod === "face" ? (
+          <FaceAuth 
+            onFailure={handleFaceFailure} 
+            onSwitchToManual={() => setAuthMethod("manual")} 
+          />
+        ) : (
+          <RegAuth onSwitchToFace={() => {
+            setAuthMethod("face");
+            setFailedAttempts(0);
+          }} />
+        )}
       </div>
-
-      {/* Leaderboard Section */}
-      <Section 
-        title="District Leaderboard" 
-        subtitle="Live points tracking across all stages"
-      >
-        <Leaderboard />
-      </Section>
     </div>
   );
 }
