@@ -1,9 +1,14 @@
-import competitions from "@/mock/competitions";
+// src/services/competitionService.js
+import competitions from "@/mock/competitions"; // Adjust path if your mock file is named differently
 
-async function getCompetitions() {
-  return competitions;
-}
+// Helper function to simulate a slow network (1.5 seconds)
+const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-export default {
-  getCompetitions,
+const competitionService = {
+  getCompetitions: async () => {
+    await delay(1500); // Forces the app to wait 1.5s, showing the skeletons
+    return competitions;
+  }
 };
+
+export default competitionService;
