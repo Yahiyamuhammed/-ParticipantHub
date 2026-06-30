@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { ScanFace, Search, Compass, ArrowRight } from "lucide-react";
 import Section from "@/components/common/Section";
 import Card from "@/components/common/Card";
-import Leaderboard from "@/features/landing/components/Leaderboard";
+import Leaderboard from "@/features/landing/components/LeaderBoard";
 import { useAuth } from "@/context/AuthContext";
 
 export default function LandingPage() {
