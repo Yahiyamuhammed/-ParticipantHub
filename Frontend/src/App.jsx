@@ -1,9 +1,9 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Layout from './components/Layout';
-import Recognize from './pages/Recognize';
-import Register from './pages/Register';
-import Participants from './pages/Participants';
-import WhatsAppTester from './pages/WhatsAppTester';
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Layout from "./components/Layout";
+import Recognize from "../pages/Recognize";
+import Register from "../pages/Register";
+import Participants from "../pages/Participants";
+import WhatsAppTester from "../pages/WhatsAppTester";
 
 function App() {
   return (

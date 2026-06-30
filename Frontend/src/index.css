@@ -1,10 +1,30 @@
 @import "tailwindcss";
 
-body {
-  @apply bg-slate-50 text-slate-900 antialiased;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-/* Optional: Smooth transitions for all interactive elements */
-button, a {
-  @apply transition-all duration-200 ease-in-out;
+html {
+  font-family:
+    Inter,
+    system-ui,
+    sans-serif;
+}
+
+body {
+  background: #fafafa;
+  color: #111827;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
 }
