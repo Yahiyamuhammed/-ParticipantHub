@@ -15,7 +15,7 @@ export default function ExplorePage() {
   const [searchQuery, setSearchQuery] = useState("");
   const location = useLocation();
   const searchInputRef = useRef(null);
-  
+
   useEffect(() => {
     // If navigated from the Landing page's Search button, focus immediately
     if (location.state?.autoFocusSearch && searchInputRef.current) {
@@ -25,16 +25,17 @@ export default function ExplorePage() {
 
   // Group and filter competitions based on time and search query
   const { live, soon, upcoming } = useMemo(() => {
-    const filtered = (competitions || []).filter(comp => 
-      comp.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      comp.stage.toLowerCase().includes(searchQuery.toLowerCase())
+    const filtered = (competitions || []).filter(
+      (comp) =>
+        comp.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        comp.stage.toLowerCase().includes(searchQuery.toLowerCase()),
     );
 
     const grouped = { live: [], soon: [], upcoming: [] };
 
-    filtered.forEach(comp => {
+    filtered.forEach((comp) => {
       const status = getEventStatus(comp.startTime, comp.endTime);
-      
+
       if (status.label === "Completed") return; // Hide completed from explore
 
       if (status.isLive) {
@@ -53,7 +54,7 @@ export default function ExplorePage() {
     <div className="flex flex-col min-h-screen pb-12 bg-gray-50 -mx-5 px-5 pt-6">
       {/* Header with Back Button */}
       <header className="flex items-center gap-3 mb-6">
-        <button 
+        <button
           onClick={() => navigate(-1)}
           className="p-2 -ml-2 text-gray-500 hover:text-gray-900 transition-colors rounded-full hover:bg-gray-200/50"
         >
@@ -68,7 +69,7 @@ export default function ExplorePage() {
           <SearchIcon className="h-5 w-5 text-gray-400" />
         </div>
         <input
-        ref={searchInputRef}
+          ref={searchInputRef}
           type="text"
           placeholder="Search competitions or stages..."
           value={searchQuery}
@@ -85,7 +86,6 @@ export default function ExplorePage() {
         </div>
       ) : (
         <div className="flex flex-col gap-8">
-          
           {/* Starting Soon Section */}
           {soon.length > 0 && (
             <section>
@@ -93,7 +93,9 @@ export default function ExplorePage() {
                 Starting Soon
               </h2>
               <div className="flex flex-col gap-3">
-                {soon.map(comp => <CompetitionCard key={comp.id} competition={comp} />)}
+                {soon.map((comp) => (
+                  <CompetitionCard key={comp.id} competition={comp} />
+                ))}
               </div>
             </section>
           )}
@@ -105,7 +107,9 @@ export default function ExplorePage() {
                 Happening Now
               </h2>
               <div className="flex flex-col gap-3">
-                {live.map(comp => <CompetitionCard key={comp.id} competition={comp} />)}
+                {live.map((comp) => (
+                  <CompetitionCard key={comp.id} competition={comp} />
+                ))}
               </div>
             </section>
           )}
@@ -117,7 +121,9 @@ export default function ExplorePage() {
                 Later Today
               </h2>
               <div className="flex flex-col gap-3">
-                {upcoming.map(comp => <CompetitionCard key={comp.id} competition={comp} />)}
+                {upcoming.map((comp) => (
+                  <CompetitionCard key={comp.id} competition={comp} />
+                ))}
               </div>
             </section>
           )}
@@ -126,7 +132,9 @@ export default function ExplorePage() {
           {live.length === 0 && soon.length === 0 && upcoming.length === 0 && (
             <div className="text-center py-12 px-4 bg-white rounded-3xl border border-gray-100">
               <h3 className="text-gray-900 font-bold mb-1">No events found</h3>
-              <p className="text-sm text-gray-500">We couldn't find any upcoming events matching your search.</p>
+              <p className="text-sm text-gray-500">
+                We couldn't find any upcoming events matching your search.
+              </p>
             </div>
           )}
         </div>
