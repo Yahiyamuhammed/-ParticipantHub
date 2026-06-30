@@ -6,8 +6,8 @@ import { Badge } from "@/components/ui/Badge"; // Assuming we moved Badge here
 import { getEventStatus } from "@/utils/time";
 
 export default function CompetitionCard({ competition }) {
-  const [status, setStatus] = useState(() => 
-    getEventStatus(competition.startTime, competition.endTime)
+  const [status, setStatus] = useState(() =>
+    getEventStatus(competition.startTime, competition.endTime),
   );
 
   // Force time recalculation every minute
@@ -24,22 +24,22 @@ export default function CompetitionCard({ competition }) {
 
   const handleNavigate = (e) => {
     e.stopPropagation();
-    // In v1, we open Google Maps intents. 
+    // In v1, we open Google Maps intents.
     // Format: geo:lat,lng or a direct google maps link.
     const url = `https://www.google.com/maps/search/?api=1&query=${competition.latitude},${competition.longitude}`;
-    window.open(url, '_blank');
+    window.open(url, "_blank");
   };
 
   return (
     <Card padding="p-4" className="flex flex-col gap-3">
       <div className="flex justify-between items-start">
         <div>
-          <h3 className="text-lg font-bold text-gray-900">{competition.title}</h3>
+          <h3 className="text-lg font-bold text-gray-900">
+            {competition.title}
+          </h3>
           <p className="text-sm text-gray-500 mt-0.5">{competition.stage}</p>
         </div>
-        <Badge variant={status.variant}>
-          {status.label}
-        </Badge>
+        <Badge variant={status.variant}>{status.label}</Badge>
       </div>
 
       {/* Action Row */}
@@ -47,13 +47,13 @@ export default function CompetitionCard({ competition }) {
         <span className="text-xs text-gray-400 font-medium">
           ID: {competition.id}
         </span>
-        
+
         {status.label !== "Completed" && (
-          <button 
+          <button
             onClick={handleNavigate}
-            className="flex items-center gap-1 text-sm font-semibold text-blue-600 hover:text-blue-700 bg-blue-50 px-3 py-1.5 rounded-lg transition-colors"
+            className="flex items-center gap-1.5 text-[13px] font-bold text-brand-dark hover:bg-brand-dark/5 bg-brand-dark/5 px-3 py-1.5 rounded-lg transition-colors"
           >
-            <Navigation2 className="w-4 h-4" />
+            <Navigation2 className="w-4 h-4 text-brand-light" />
             Navigate
           </button>
         )}
