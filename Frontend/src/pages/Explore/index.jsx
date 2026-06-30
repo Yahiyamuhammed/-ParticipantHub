@@ -1,5 +1,13 @@
+import MainLayout from "@/layouts/MainLayout";
+
 function ExplorePage() {
-  return <h1>Explore Events</h1>;
+  return (
+    <MainLayout>
+      <h1 className="text-3xl font-bold">
+        Explore Events
+      </h1>
+    </MainLayout>
+  );
 }
 
 export default ExplorePage;

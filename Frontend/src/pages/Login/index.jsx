@@ -1,5 +1,13 @@
+import MainLayout from "@/layouts/MainLayout";
+
 function LoginPage() {
-  return <h1>Login Page</h1>;
+  return (
+    <MainLayout>
+      <h1 className="text-3xl font-bold">
+        Login
+      </h1>
+    </MainLayout>
+  );
 }
 
 export default LoginPage;
