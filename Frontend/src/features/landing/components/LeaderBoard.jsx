@@ -4,9 +4,20 @@ import Card from "@/components/common/Card";
 
 // Mock data - eventually move to a service
 const mockLeaderboard = [
-  { id: 1, district: "Malappuram", points: 450, isCurrentUsers: false },
-  { id: 2, district: "Kozhikode", points: 420, isCurrentUsers: false },
-  { id: 3, district: "Kannur", points: 380, isCurrentUsers: false },
+  { id: 1, district: "Thiruvananthapuram", points: 980, isCurrentUsers: false },
+  { id: 2, district: "Kollam", points: 945, isCurrentUsers: false },
+  { id: 3, district: "Pathanamthitta", points: 910, isCurrentUsers: false },
+  { id: 4, district: "Alappuzha", points: 890, isCurrentUsers: false },
+  { id: 5, district: "Kottayam", points: 860, isCurrentUsers: false },
+  { id: 6, district: "Idukki", points: 835, isCurrentUsers: false },
+  { id: 7, district: "Ernakulam", points: 810, isCurrentUsers: false },
+  { id: 8, district: "Thrissur", points: 790, isCurrentUsers: false },
+  { id: 9, district: "Palakkad", points: 760, isCurrentUsers: false },
+  { id: 10, district: "Malappuram", points: 735, isCurrentUsers: false },
+  { id: 11, district: "Kozhikode", points: 710, isCurrentUsers: true },
+  { id: 12, district: "Wayanad", points: 685, isCurrentUsers: false },
+  { id: 13, district: "Kannur", points: 660, isCurrentUsers: false },
+  { id: 14, district: "Kasaragod", points: 640, isCurrentUsers: false },
 ];
 
 export default function Leaderboard() {

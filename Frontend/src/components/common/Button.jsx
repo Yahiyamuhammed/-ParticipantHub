@@ -2,9 +2,10 @@
 import clsx from "clsx";
 
 const variants = {
-  primary: "bg-gray-900 text-white hover:bg-gray-800",
-  secondary: "bg-gray-100 text-gray-900 hover:bg-gray-200",
-  outline: "border border-gray-200 bg-white hover:bg-gray-50 text-gray-900",
+  // Gold background, dark forest text
+  primary: "bg-brand-accent text-brand-dark hover:bg-brand-accentLight font-semibold", 
+  secondary: "bg-white text-brand-dark hover:bg-gray-50 border border-black/5",
+  outline: "border border-brand-accent/30 text-brand-accent hover:border-brand-accent/60 bg-transparent",
 };
 
 function Button({ children, className, variant = "primary", type = "button", disabled, ...props }) {
