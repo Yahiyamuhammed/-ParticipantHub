@@ -6,7 +6,7 @@ export default function LiveTicker({ updates = [] }) {
   if (!updates || updates.length === 0) return null;
 
   return (
-    <div className="w-full bg-brand-dark border border-brand-mid rounded-2xl overflow-hidden relative flex items-center shadow-lg h-[56px]">
+    <div className="bg-brand-dark border border-brand-mid rounded-2xl overflow-hidden relative flex items-center shadow-lg h-[56px]">
       
       {/* Left Icon Area - Wider padding and stronger shadow to block text seamlessly */}
       <div className="absolute left-0 z-20 bg-brand-dark px-5 h-full flex items-center border-r border-brand-light/30 shadow-[6px_0_16px_rgba(15,61,48,1)]">
