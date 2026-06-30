@@ -5,6 +5,7 @@ import { ArrowLeft, Search as SearchIcon } from "lucide-react";
 import useCompetitions from "@/hooks/useCompetitions";
 import CompetitionCard from "@/components/shared/CompetitionCard";
 import { getEventStatus } from "@/utils/time";
+import { CardSkeleton } from "@/components/common/Skeleton";
 
 export default function ExplorePage() {
   const navigate = useNavigate();
@@ -65,7 +66,11 @@ export default function ExplorePage() {
       </div>
 
       {isLoading ? (
-        <div className="text-center py-10 text-gray-500">Loading events...</div>
+        <div className="flex flex-col gap-4 mt-4">
+          <CardSkeleton />
+          <CardSkeleton />
+          <CardSkeleton />
+        </div>
       ) : (
         <div className="flex flex-col gap-8">
           

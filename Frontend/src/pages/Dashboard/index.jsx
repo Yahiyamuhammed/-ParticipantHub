@@ -8,6 +8,7 @@ import Card from "@/components/common/Card";
 import ProfileHeader from "@/features/dashboard/components/ProfileHeader";
 import NextProgramHero from "@/features/dashboard/components/NextProgramHero";
 import ScheduleTabs from "@/features/dashboard/components/ScheduleTabs";
+import Skeleton, { CardSkeleton, HeroSkeleton } from "@/components/common/Skeleton";
 
 export default function DashboardPage() {
   const { competitions, isLoading } = useCompetitions();
@@ -16,7 +17,27 @@ export default function DashboardPage() {
   const nextProgram = competitions?.[0]; 
 
   if (isLoading) {
-    return <div className="p-5 text-center text-gray-500 mt-10">Loading dashboard...</div>;
+    return (
+      <div className="flex flex-col gap-6 pb-12 pt-6">
+        <div className="bg-white p-4 rounded-3xl border border-gray-100 flex gap-4 items-center">
+          <Skeleton className="w-12 h-12 rounded-full" />
+          <div className="space-y-2 flex-1">
+            <Skeleton className="h-5 w-1/2 rounded-md" />
+            <Skeleton className="h-4 w-2/3 rounded-md" />
+          </div>
+        </div>
+        <HeroSkeleton />
+        <div className="flex gap-2">
+          <Skeleton className="h-10 flex-1 rounded-xl" />
+          <Skeleton className="h-10 flex-1 rounded-xl" />
+          <Skeleton className="h-10 flex-1 rounded-xl" />
+        </div>
+        <div className="flex flex-col gap-3">
+          <CardSkeleton />
+          <CardSkeleton />
+        </div>
+      </div>
+    );
   }
 
   return (
