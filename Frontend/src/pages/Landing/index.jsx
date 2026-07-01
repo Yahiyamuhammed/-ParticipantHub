@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ScanFace, ArrowRight, Sparkles, Radio } from "lucide-react";
-import Leaderboard from "@/features/landing/components/Leaderboard";
+import Leaderboard from "@/features/landing/components/LeaderBoard";
 import { useAuth } from "@/context/AuthContext";
 import Button from "@/components/common/Button";
 import LiveTicker from "@/components/shared/LiveTicker";
