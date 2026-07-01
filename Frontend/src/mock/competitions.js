@@ -13,7 +13,7 @@ const competitions = [
     id: "C-101",
     title: "Mapila Song",
     stage: "Stage 4",
-    startTime: getRelativeTime(15), // Started 15 mins ago
+    startTime: getRelativeTime(-15), // Started 15 mins ago
     endTime: getRelativeTime(30),    // Ends in 30 mins
     latitude: 11.691,
     longitude: 75.632,
