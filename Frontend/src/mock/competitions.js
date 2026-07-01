@@ -1,20 +1,53 @@
 // src/mock/competitions.js
 
-// Helper to generate times relative to right now so the UI is always testable
 const now = new Date();
-const getRelativeTime = (offsetMinutes) => {
-  const date = new Date(now.getTime() + offsetMinutes * 60000);
+
+// Helper to generate times relative to right now.
+// offsetDays allows us to push events to yesterday (-1) or tomorrow (1).
+const getRelativeTime = (offsetMinutes, offsetDays = 0) => {
+  const date = new Date(now.getTime() + (offsetMinutes * 60000) + (offsetDays * 24 * 60 * 60 * 1000));
   return date.toISOString();
 };
 
 const competitions = [
-  // --- HAPPENING NOW (LIVE) ---
+  // --- PREVIOUS DAYS (Past) ---
+  {
+    id: "C-080",
+    title: "Poetry Writing (Malayalam)",
+    stage: "Hall C",
+    startTime: getRelativeTime(0, -2), // 2 days ago
+    endTime: getRelativeTime(60, -2),
+    latitude: 11.691,
+    longitude: 75.632,
+  },
+  {
+    id: "C-090",
+    title: "Digital Painting",
+    stage: "Art Gallery",
+    startTime: getRelativeTime(120, -1), // 1 day ago
+    endTime: getRelativeTime(240, -1),
+    latitude: 11.695,
+    longitude: 75.628,
+  },
+
+  // --- TODAY: COMPLETED ---
+  {
+    id: "C-099",
+    title: "Water Color Painting",
+    stage: "Art Gallery",
+    startTime: getRelativeTime(-180), // Started 3 hours ago today
+    endTime: getRelativeTime(-120),   
+    latitude: 11.695,
+    longitude: 75.628,
+  },
+
+  // --- TODAY: HAPPENING NOW (LIVE) ---
   {
     id: "C-101",
     title: "Mapila Song",
     stage: "Stage 4",
-    startTime: getRelativeTime(15), // Started 15 mins ago
-    endTime: getRelativeTime(30),    // Ends in 30 mins
+    startTime: getRelativeTime(-15), // Started 15 mins ago
+    endTime: getRelativeTime(30),    
     latitude: 11.691,
     longitude: 75.632,
   },
@@ -28,7 +61,7 @@ const competitions = [
     longitude: 75.630,
   },
 
-  // --- STARTING SOON (Warning colors) ---
+  // --- TODAY: STARTING SOON ---
   {
     id: "C-102",
     title: "Essay Writing (English)",
@@ -38,17 +71,8 @@ const competitions = [
     latitude: 11.692,
     longitude: 75.633,
   },
-  {
-    id: "C-105",
-    title: "Elocution (Malayalam)",
-    stage: "Stage 1",
-    startTime: getRelativeTime(45),  // Starts in 45 mins
-    endTime: getRelativeTime(90),
-    latitude: 11.694,
-    longitude: 75.631,
-  },
 
-  // --- LATER TODAY / UPCOMING ---
+  // --- TODAY: LATER ---
   {
     id: "C-103",
     title: "Group Dance (Oppana)",
@@ -58,34 +82,34 @@ const competitions = [
     latitude: 11.690,
     longitude: 75.630,
   },
+
+  // --- UPCOMING DAYS (Future) ---
   {
-    id: "C-106",
-    title: "Quiz Competition Finals",
+    id: "C-110",
+    title: "Daffmuttu",
     stage: "Main Stage",
-    startTime: getRelativeTime(240), // Starts in 4 hours
-    endTime: getRelativeTime(300),
+    startTime: getRelativeTime(60, 1), // Tomorrow
+    endTime: getRelativeTime(120, 1),
     latitude: 11.690,
     longitude: 75.630,
   },
-
-  // --- COMPLETED ---
   {
-    id: "C-099",
-    title: "Water Color Painting",
-    stage: "Art Gallery",
-    startTime: getRelativeTime(-180), // Started 3 hours ago
-    endTime: getRelativeTime(-120),   // Ended 2 hours ago
-    latitude: 11.695,
-    longitude: 75.628,
+    id: "C-115",
+    title: "Debate (English)",
+    stage: "Stage 2",
+    startTime: getRelativeTime(0, 2), // 2 days from now
+    endTime: getRelativeTime(120, 2),
+    latitude: 11.692,
+    longitude: 75.633,
   },
   {
-    id: "C-100",
-    title: "Pencil Drawing",
-    stage: "Art Gallery",
-    startTime: getRelativeTime(-240), 
-    endTime: getRelativeTime(-180),   
-    latitude: 11.695,
-    longitude: 75.628,
+    id: "C-120",
+    title: "Grand Finale Showcase",
+    stage: "Main Stage",
+    startTime: getRelativeTime(180, 3), // 3 days from now
+    endTime: getRelativeTime(300, 3),
+    latitude: 11.690,
+    longitude: 75.630,
   }
 ];
 

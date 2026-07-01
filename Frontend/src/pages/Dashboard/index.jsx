@@ -18,7 +18,7 @@ import { HeroSkeleton, CardSkeleton } from "@/components/common/Skeleton";
 export default function DashboardPage() {
   const { competitions, isLoading } = useCompetitions();
 
-  const nextProgram = competitions?.[0];
+  const nextProgram = competitions?.[5];
 
   if (isLoading) {
     return (
