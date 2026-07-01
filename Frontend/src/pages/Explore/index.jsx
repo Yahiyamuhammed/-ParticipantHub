@@ -1,19 +1,17 @@
 // src/pages/Explore/index.jsx
-import React, { useState, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useMemo, useRef, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { ArrowLeft, Search as SearchIcon } from "lucide-react";
 import useCompetitions from "@/hooks/useCompetitions";
 import CompetitionCard from "@/components/shared/CompetitionCard";
 import { getEventStatus } from "@/utils/time";
 import { CardSkeleton } from "@/components/common/Skeleton";
-import { useLocation } from "react-router-dom";
-import { useRef, useEffect } from "react";
 
 export default function ExplorePage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { competitions, isLoading } = useCompetitions();
   const [searchQuery, setSearchQuery] = useState("");
-  const location = useLocation();
   const searchInputRef = useRef(null);
 
   useEffect(() => {
@@ -38,7 +36,7 @@ export default function ExplorePage() {
 
       if (status.label === "Completed") return; // Hide completed from explore
 
-      if (status.isLive) {
+      if (status.isLive || status.label === "Happening Now") {
         grouped.live.push(comp);
       } else if (status.label.includes("Starts in")) {
         grouped.soon.push(comp);
@@ -51,22 +49,23 @@ export default function ExplorePage() {
   }, [competitions, searchQuery]);
 
   return (
-    <div className="flex flex-col min-h-screen pb-12 bg-gray-50 -mx-5 px-5 pt-6">
-      {/* Header with Back Button */}
+    <div className="flex flex-col min-h-screen pb-12 bg-brand-cream px-5 pt-6">
+      
+      {/* Premium Header */}
       <header className="flex items-center gap-3 mb-6">
         <button
           onClick={() => navigate(-1)}
-          className="p-2 -ml-2 text-gray-500 hover:text-gray-900 transition-colors rounded-full hover:bg-gray-200/50"
+          className="p-2 -ml-2 text-brand-textMuted hover:text-brand-dark transition-colors rounded-full hover:bg-brand-dark/5 active:scale-95"
         >
           <ArrowLeft className="w-5 h-5" />
         </button>
-        <h1 className="text-2xl font-bold text-gray-900">Explore Events</h1>
+        <h1 className="text-[24px] font-bold text-brand-textDark tracking-tight">Explore Events</h1>
       </header>
 
-      {/* Search Bar */}
+      {/* Elevated Search Bar */}
       <div className="relative mb-8">
         <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-          <SearchIcon className="h-5 w-5 text-gray-400" />
+          <SearchIcon className="h-5 w-5 text-brand-textMuted/70" />
         </div>
         <input
           ref={searchInputRef}
@@ -74,7 +73,7 @@ export default function ExplorePage() {
           placeholder="Search competitions or stages..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full pl-11 pr-4 py-3.5 bg-white border-none rounded-2xl shadow-sm ring-1 ring-gray-900/5 text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-gray-900 transition-all outline-none"
+          className="w-full pl-11 pr-4 py-3.5 bg-brand-card border border-black/5 rounded-2xl shadow-sm text-brand-textDark placeholder-brand-textMuted/60 focus:ring-2 focus:ring-brand-accent/50 focus:border-brand-accent transition-all outline-none text-[15px]"
         />
       </div>
 
@@ -86,24 +85,14 @@ export default function ExplorePage() {
         </div>
       ) : (
         <div className="flex flex-col gap-8">
-          {/* Starting Soon Section */}
-          {soon.length > 0 && (
-            <section>
-              <h2 className="text-sm font-bold uppercase tracking-wider text-yellow-600 mb-3 ml-1">
-                Starting Soon
-              </h2>
-              <div className="flex flex-col gap-3">
-                {soon.map((comp) => (
-                  <CompetitionCard key={comp.id} competition={comp} />
-                ))}
-              </div>
-            </section>
-          )}
-
-          {/* Live Now Section */}
+          
+          {/* 1. Live Now Section (With dynamic top spacing) */}
           {live.length > 0 && (
             <section>
-              <h2 className="text-sm font-bold uppercase tracking-wider text-green-600 mb-3 ml-1">
+              {/* Force Space: This only renders if there are active live events */}
+              <div className="h-4 w-full shrink-0"></div>
+              
+              <h2 className="text-[12px] font-bold uppercase tracking-[0.15em] text-brand-dark mb-3 ml-1">
                 Happening Now
               </h2>
               <div className="flex flex-col gap-3">
@@ -114,10 +103,24 @@ export default function ExplorePage() {
             </section>
           )}
 
-          {/* Upcoming (Later) Section */}
+          {/* 2. Starting Soon Section */}
+          {soon.length > 0 && (
+            <section>
+              <h2 className="text-[12px] font-bold uppercase tracking-[0.15em] text-brand-accent mb-3 ml-1">
+                Starting Soon
+              </h2>
+              <div className="flex flex-col gap-3">
+                {soon.map((comp) => (
+                  <CompetitionCard key={comp.id} competition={comp} />
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* 3. Upcoming (Later) Section */}
           {upcoming.length > 0 && (
             <section>
-              <h2 className="text-sm font-bold uppercase tracking-wider text-gray-500 mb-3 ml-1">
+              <h2 className="text-[12px] font-bold uppercase tracking-[0.15em] text-brand-textMuted mb-3 ml-1">
                 Later Today
               </h2>
               <div className="flex flex-col gap-3">
@@ -130,10 +133,10 @@ export default function ExplorePage() {
 
           {/* Empty State when searching */}
           {live.length === 0 && soon.length === 0 && upcoming.length === 0 && (
-            <div className="text-center py-12 px-4 bg-white rounded-3xl border border-gray-100">
-              <h3 className="text-gray-900 font-bold mb-1">No events found</h3>
-              <p className="text-sm text-gray-500">
-                We couldn't find any upcoming events matching your search.
+            <div className="text-center py-12 px-4 bg-brand-cream/50 rounded-3xl border border-black/5">
+              <h3 className="text-brand-textDark font-bold mb-1 text-[16px]">No events found</h3>
+              <p className="text-[13px] text-brand-textMuted">
+                We couldn't find any upcoming events matching "{searchQuery}".
               </p>
             </div>
           )}
