@@ -1,14 +1,41 @@
 // src/features/dashboard/components/ScheduleTabs.jsx
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import CompetitionCard from "@/components/shared/CompetitionCard";
 import clsx from "clsx";
 
 export default function ScheduleTabs({ competitions }) {
   const [activeTab, setActiveTab] = useState("today");
 
-  // In a real scenario, you'd filter these based on actual dates.
-  // For the mock, we will just split the array to simulate it.
-  const todayComps = competitions;
+  // NEW: Smart sorting logic
+  const sortedCompetitions = useMemo(() => {
+    if (!competitions) return [];
+    
+    const now = new Date().getTime();
+
+    return [...competitions].sort((a, b) => {
+      // Safely parse dates
+      const aStart = new Date(a.startTime).getTime();
+      const aEnd = new Date(a.endTime).getTime();
+      const bStart = new Date(b.startTime).getTime();
+      const bEnd = new Date(b.endTime).getTime();
+
+      // Check if events are strictly in the past
+      const aIsCompleted = aEnd < now;
+      const bIsCompleted = bEnd < now;
+
+      // 1. If 'A' is completed but 'B' is not, push 'A' down the list
+      if (aIsCompleted && !bIsCompleted) return 1;
+      
+      // 2. If 'B' is completed but 'A' is not, push 'B' down the list
+      if (!aIsCompleted && bIsCompleted) return -1;
+
+      // 3. Otherwise (both completed, or both upcoming/live), sort chronologically by start time
+      return aStart - bStart;
+    });
+  }, [competitions]);
+
+  // Apply the sorted array to the tabs
+  const todayComps = sortedCompetitions;
   const previousComps = [];
   const upcomingComps = [];
 
@@ -25,13 +52,13 @@ export default function ScheduleTabs({ competitions }) {
           <CompetitionCard key={comp.id} competition={comp} />
         ))
       ) : (
-        <div className="text-center py-10 text-gray-500 bg-white rounded-3xl border border-gray-100">
+        <div className="text-center py-10 text-brand-textMuted bg-brand-cream/30 rounded-2xl border border-black/5 text-[13px] font-medium">
           No competitions scheduled for today.
         </div>
       );
     }
     return (
-      <div className="text-center py-10 text-gray-500 bg-white rounded-3xl border border-gray-100">
+      <div className="text-center py-10 text-brand-textMuted bg-brand-cream/30 rounded-2xl border border-black/5 text-[13px] font-medium">
         No data available for {activeTab}.
       </div>
     );
@@ -39,10 +66,7 @@ export default function ScheduleTabs({ competitions }) {
 
   return (
     <div className="flex flex-col gap-5 bg-brand-card p-4 rounded-3xl border border-black/5 shadow-sm">
-      {" "}
-      {/* Premium Segmented Control */}
       <div className="flex bg-brand-dark/5 p-1 rounded-2xl">
-        {" "}
         {tabs.map((tab) => (
           <button
             key={tab.id}
@@ -58,7 +82,7 @@ export default function ScheduleTabs({ competitions }) {
           </button>
         ))}
       </div>
-      <div className="flex flex-col gap-3"> {renderContent()}</div>
+      <div className="flex flex-col gap-3">{renderContent()}</div>
     </div>
   );
 }
