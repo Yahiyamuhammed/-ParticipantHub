@@ -67,14 +67,15 @@ export default function ScheduleTabs({ competitions }) {
   return (
     <div className="flex flex-col gap-5 bg-brand-card p-4 rounded-3xl border border-black/5 shadow-sm">
       <div className="flex bg-brand-dark/5 p-1 rounded-2xl">
-        {tabs.map((tab) => (
+       {tabs.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
             className={clsx(
-              "flex-1 py-2.5 text-[13px] font-bold uppercase tracking-[0.1em] rounded-xl transition-all duration-300",
+              // Changed: py-2 (instead of 2.5), text-[11px] (instead of 13), tracking-wider (instead of 0.1em), rounded-lg
+              "flex-1 py-2 px-1 text-[11px] font-bold uppercase tracking-wider rounded-lg transition-all duration-300 whitespace-nowrap",
               activeTab === tab.id
-                ? "bg-brand-dark text-brand-accent shadow-lg"
+                ? "bg-brand-dark text-brand-accent shadow-md"
                 : "text-brand-textMuted hover:text-brand-dark",
             )}
           >
