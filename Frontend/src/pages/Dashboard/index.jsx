@@ -8,16 +8,17 @@ import Card from "@/components/common/Card";
 import ProfileHeader from "@/features/dashboard/components/ProfileHeader";
 import NextProgramHero from "@/features/dashboard/components/NextProgramHero";
 import ScheduleTabs from "@/features/dashboard/components/ScheduleTabs";
+import AlertBox from "@/features/dashboard/components/AlertBox";
 
 // Import the new components and mock data
 import ResultCard from "@/components/shared/ResultCard";
-import mockResults from "@/mock/results"; 
+import mockResults from "@/mock/results";
 import { HeroSkeleton, CardSkeleton } from "@/components/common/Skeleton";
 
 export default function DashboardPage() {
   const { competitions, isLoading } = useCompetitions();
 
-  const nextProgram = competitions?.[0]; 
+  const nextProgram = competitions?.[0];
 
   if (isLoading) {
     return (
@@ -38,42 +39,48 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="flex flex-col gap-6 pb-12 pt-6">
-      <ProfileHeader />
-
-      <Card padding="p-3" className="bg-yellow-50 border border-yellow-100 shadow-none flex items-start gap-3">
-        <Bell className="w-5 h-5 text-yellow-600 shrink-0 mt-0.5" />
-        <div>
-          <h4 className="text-sm font-bold text-yellow-800">Stage 4 Relocated</h4>
-          <p className="text-xs text-yellow-700 mt-0.5">Due to weather, all Stage 4 events are moved to the Main Indoor Hall.</p>
+    <div className="flex flex-col min-h-screen bg-brand-cream pb-12">
+      {/* 1. GREEN HERO */}
+      <div className="bg-brand-dark px-5 pt-12 pb-8 rounded-b-[2.5rem] shadow-xl text-brand-cream">
+        <div className="w-full max-w-md mx-auto">
+          <ProfileHeader />
+          <div className="h-8 w-full"></div>{" "}
+          {/* Space between Profile & Alert */}
+          <AlertBox /> {/* Create this small component for your alert */}
         </div>
-      </Card>
-
-      <NextProgramHero competition={nextProgram} />
-
-      <div className="flex items-center justify-between px-2">
-        <span className="text-sm font-bold text-gray-900">Event Progress</span>
-        <span className="text-sm font-medium text-gray-500">Day 3 of 6</span>
       </div>
 
-      <Section>
-        <ScheduleTabs competitions={competitions} />
-      </Section>
-      
-      {/* NEW: Published Results Section */}
-      <Section>
-        <div className="flex items-center gap-2 mb-3 ml-2">
-          <Trophy className="w-5 h-5 text-gray-900" />
-          <h2 className="text-lg font-bold text-gray-900">Published Results</h2>
+      {/* 2. BODY CONTENT (Grouped) */}
+      <div className="px-5 mt-10 max-w-md mx-auto w-full flex flex-col">
+        <div className="h-6 w-full"></div>
+        {/* GROUP A: The Next Program */}
+        <NextProgramHero competition={nextProgram} />
+        <div className="h-12 w-full"></div>{" "}
+        {/* Spacing between Hero and Schedule Group */}
+        {/* GROUP B: Schedule & Tabs */}
+        <div className="flex flex-col gap-4">
+          <h2 className="text-[20px] font-bold text-brand-textDark ml-1">
+            Event Schedule
+          </h2>
+          <ScheduleTabs competitions={competitions} />
         </div>
-        
-        <div className="flex flex-col gap-3">
-          {mockResults.map(result => (
-            <ResultCard key={result.id} result={result} />
-          ))}
+        <div className="h-16 w-full"></div>{" "}
+        {/* Spacing between Schedule Group & Results Group */}
+        {/* GROUP C: Results */}
+        <div className="flex flex-col gap-5">
+          <div className="flex items-center gap-2 ml-1">
+            <Trophy className="w-5 h-5 text-brand-dark" />
+            <h2 className="text-[20px] font-bold text-brand-textDark">
+              Published Results
+            </h2>
+          </div>
+          <div className="flex flex-col gap-3">
+            {mockResults.map((result) => (
+              <ResultCard key={result.id} result={result} />
+            ))}
+          </div>
         </div>
-      </Section>
-
+      </div>
     </div>
   );
 }

@@ -11,7 +11,6 @@ export default function NextProgramHero({ competition }) {
   return (
     // Swapped generic gray for brand-dark, and tweaked paddings
     <div className="bg-brand-dark text-brand-cream rounded-[2rem] p-7 shadow-lg relative overflow-hidden mx-1">
-      
       {/* Subtle brand-light glow instead of blue */}
       <div className="absolute -top-12 -right-12 w-32 h-32 bg-brand-light rounded-full blur-3xl opacity-40 pointer-events-none"></div>
 
@@ -20,13 +19,19 @@ export default function NextProgramHero({ competition }) {
         <span className="text-[11px] font-bold uppercase tracking-[0.08em] text-brand-accent mb-2 block">
           Next Program
         </span>
-        <h2 className="text-3xl font-bold mb-1 tracking-tight text-white">{competition.title}</h2>
-        <p className="text-brand-cream/80 font-medium text-lg mb-8">{competition.stage}</p>
+        <h2 className="text-3xl font-bold mb-1 tracking-tight text-white">
+          {competition.title}
+        </h2>
+        <p className="text-brand-cream/80 font-medium text-lg mb-8">
+          {competition.stage}
+        </p>
 
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 bg-brand-mid/50 border border-brand-light/30 px-3 py-1.5 rounded-lg backdrop-blur-sm">
             <Clock className="w-4 h-4 text-brand-accent" />
-            <span className="text-sm font-semibold text-brand-cream">{status.label}</span>
+            <span className="text-sm font-semibold text-brand-cream">
+              {status.label}
+            </span>
           </div>
 
           {/* Gold Button */}
