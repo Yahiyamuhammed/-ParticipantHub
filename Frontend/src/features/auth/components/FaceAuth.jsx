@@ -6,15 +6,17 @@ import { useNavigate } from "react-router-dom";
 import {
   ScanFace,
   AlertCircle,
-  ChevronRight,
   ArrowRight,
   X,
   CameraOff,
+  RefreshCcw
 } from "lucide-react";
 import Button from "@/components/common/Button";
 
 export default function FaceAuth() {
   const webcamRef = useRef(null);
+  const inputRef = useRef(null); // NEW: Ref for the text input
+  
   const { login } = useAuth();
   const navigate = useNavigate();
 
@@ -25,6 +27,7 @@ export default function FaceAuth() {
 
   const [regNumber, setRegNumber] = useState("");
   const [isInputFocused, setIsInputFocused] = useState(false);
+  const [failedAttempts, setFailedAttempts] = useState(0); // NEW: Track failed scans
 
   const handleProfileSelect = (profile) => {
     login(profile);
@@ -73,28 +76,27 @@ export default function FaceAuth() {
             reg: "SSF00921",
             district: "Kozhikode",
           },
-          {
-            id: "P-2011",
-            name: "Mohammed Yahiya",
-            reg: "SSF00444",
-            district: "Kannur",
-          },
         ]);
       } else {
-        setError(
-          "Face not clearly detected. Please try again in better lighting.",
-        );
+        setError("Face not clearly detected. Please try again in better lighting.");
+        
+        // NEW: 2-Strike Auto-Focus Logic
+        setFailedAttempts((prev) => {
+          const newCount = prev + 1;
+          if (newCount >= 2) {
+            // Delay slightly to ensure UI updates before focusing
+            setTimeout(() => {
+              inputRef.current?.focus();
+            }, 150);
+          }
+          return newCount;
+        });
       }
     }, 1500);
   }, [webcamRef, login, navigate]);
 
-  // --- MATCH SELECTION & PERMISSION SCREENS REMAIN THE SAME ---
-  if (possibleMatches.length > 0) {
-    /* ... */
-  }
-  if (!cameraPermission) {
-    /* ... */
-  }
+  // If we have multiple matches, we can still render an overlay or swap views.
+  // Assuming that logic remains in your app.
 
   return (
     <div className="w-full flex flex-col items-center pb-8">
@@ -108,8 +110,47 @@ export default function FaceAuth() {
 
       <div className="h-8 w-full shrink-0"></div>
 
+      {/* CAMERA FRAME */}
       <div className="relative w-full max-w-[260px] aspect-[3/4] rounded-[2.5rem] overflow-hidden bg-brand-dark shadow-[0_20px_40px_rgba(15,61,48,0.15)] ring-4 ring-brand-accent/30 border-8 border-brand-cream transition-all duration-300">
-        {!isInputFocused ? (
+        
+        {!cameraPermission ? (
+          // STATE 1: CAMERA DENIED
+          <div className="absolute inset-0 flex flex-col items-center justify-center bg-brand-dark px-6 text-center">
+            <AlertCircle className="w-10 h-10 text-red-400 mb-4 opacity-80" />
+            <span className="text-brand-cream font-bold tracking-[0.15em] uppercase text-[12px] mb-2">
+              Camera Blocked
+            </span>
+            <p className="text-brand-light/70 font-medium text-[11px] leading-relaxed mb-5">
+              Please allow camera access in your browser settings to use face scan.
+            </p>
+            <button 
+              onClick={() => window.location.reload()}
+              className="flex items-center gap-2 px-4 py-2.5 bg-brand-cream/10 rounded-full text-brand-cream text-[10px] font-bold uppercase tracking-wider border border-brand-cream/20 hover:bg-brand-cream/20 active:scale-95 transition-all"
+            >
+              <RefreshCcw className="w-3.5 h-3.5" />
+              Reload Page
+            </button>
+          </div>
+
+        ) : isInputFocused ? (
+          // STATE 2: CAMERA PAUSED (Text input is focused)
+          <div
+            className="absolute inset-0 flex flex-col items-center justify-center bg-brand-dark cursor-pointer hover:bg-brand-dark/90 active:bg-brand-dark/80 transition-colors group"
+            onClick={() => document.activeElement?.blur()}
+          >
+            <CameraOff className="w-8 h-8 text-brand-light mb-4 opacity-60 group-hover:scale-110 transition-transform" />
+            <span className="text-brand-light/70 font-bold tracking-[0.2em] uppercase text-[11px] mb-3">
+              Camera Paused
+            </span>
+            
+            {/* Themed "Resume" Button */}
+            <div className="px-4 py-1.5 bg-brand-accent/15 border border-brand-accent/30 rounded-full text-brand-accent text-[9px] font-bold uppercase tracking-wider group-hover:bg-brand-accent/25 transition-colors">
+              Tap to Resume
+            </div>
+          </div>
+
+        ) : (
+          // STATE 3: CAMERA ACTIVE
           <Webcam
             audio={false}
             ref={webcamRef}
@@ -119,25 +160,11 @@ export default function FaceAuth() {
             onUserMediaError={() => setCameraPermission(false)}
             className={`w-full h-full object-cover transition-opacity duration-300 ${isProcessing ? "opacity-40" : "opacity-100"}`}
           />
-        ) : (
-          // NEW: Interactive Paused State
-          <div
-            className="absolute inset-0 flex flex-col items-center justify-center bg-brand-dark cursor-pointer active:bg-brand-dark/90 transition-colors"
-            // Clicking this div removes focus from the input, which triggers onBlur and restarts the camera
-            onClick={() => document.activeElement?.blur()}
-          >
-            <CameraOff className="w-8 h-8 text-brand-light mb-3 opacity-60" />
-            <span className="text-brand-light/70 font-bold tracking-[0.2em] uppercase text-[11px] mb-1.5">
-              Camera Paused
-            </span>
-            <span className="text-brand-light/40 font-semibold tracking-wider text-[9px] uppercase">
-              Tap here to resume camera
-            </span>
-          </div>
         )}
 
-        {isProcessing && !isInputFocused && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center bg-brand-dark/60 backdrop-blur-sm">
+        {/* PROCESSING OVERLAY */}
+        {isProcessing && !isInputFocused && cameraPermission && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center bg-brand-dark/60 backdrop-blur-sm z-10">
             <div className="w-12 h-12 border-4 border-brand-accent/30 border-t-brand-accent rounded-full animate-spin mb-4"></div>
             <span className="text-brand-accent font-bold tracking-widest uppercase text-[11px]">
               Analyzing
@@ -145,6 +172,7 @@ export default function FaceAuth() {
           </div>
         )}
       </div>
+
       <p className="mt-5 text-center text-[10px] font-medium leading-relaxed text-brand-textMuted/70 px-4 max-w-[280px]">
         Biometric data is processed locally for instant verification and is
         never stored on our servers.
@@ -158,16 +186,14 @@ export default function FaceAuth() {
         </div>
       )}
 
-      {/* Expanded to max-w-[300px] to comfortably fit the cancel text */}
+      {/* CONTROLS */}
       <div className="w-full max-w-[300px] flex flex-col items-center">
         <div className="flex items-center gap-2 w-full">
-          {/* Cancel Button - Moved to the Left */}
           <button
             type="button"
             onClick={() => navigate("/")}
             disabled={isProcessing}
             className="h-[56px] px-4 flex items-center justify-center gap-1.5 bg-brand-card border border-black/5 rounded-2xl shadow-sm hover:bg-gray-50 active:scale-95 transition-all text-brand-textMuted hover:text-red-500 disabled:opacity-50 shrink-0"
-            aria-label="Cancel and go back"
           >
             <X className="w-4 h-4" />
             <span className="font-bold text-[13px] uppercase tracking-wide">
@@ -175,22 +201,19 @@ export default function FaceAuth() {
             </span>
           </button>
 
-          {/* Scan Button - Moved to the Right */}
           <Button
             onClick={captureAndAuthenticate}
-            disabled={isProcessing || isInputFocused}
+            disabled={isProcessing || isInputFocused || !cameraPermission}
             variant="dark"
-            className="flex-1 py-4 text-[16px] shadow-lg"
+            className="flex-1 py-4 text-[16px] shadow-lg disabled:opacity-50"
           >
             <ScanFace className="w-5 h-5 text-brand-accentLight" />
             {isProcessing ? "Scanning..." : "Scan Face"}
           </Button>
         </div>
 
-        {/* Tighter Top Spacer */}
         <div className="h-5 w-full shrink-0"></div>
 
-        {/* The OR Divider */}
         <div className="flex items-center gap-3 w-full">
           <div className="h-px bg-black/10 flex-1"></div>
           <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-brand-textMuted">
@@ -199,12 +222,12 @@ export default function FaceAuth() {
           <div className="h-px bg-black/10 flex-1"></div>
         </div>
 
-        {/* Tighter Bottom Spacer */}
         <div className="h-5 w-full shrink-0"></div>
 
         <form onSubmit={handleRegSubmit} className="w-full">
           <div className="relative">
             <input
+              ref={inputRef} /* NEW: Attached the ref here */
               type="text"
               value={regNumber}
               onChange={(e) => setRegNumber(e.target.value)}
